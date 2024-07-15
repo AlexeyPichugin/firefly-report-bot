@@ -1,0 +1,55 @@
+# The settings for the Firefly client.
+firefly:
+    # The API key for the Firefly client.
+    api_key: "YOUR_API_KEY"
+    # he API URL for the Firefly client.
+    api_url: "YOUR_API_URL"
+    # The request timeout for the Firefly client. Defaults to 60.
+    request_timeout: 60
+
+# The settings for the Telegram bot.
+telegram:
+    # The token for the Telegram bot.
+    bot_token: "YOUR_BOT_TOKEN"
+    # The chat ID for the Telegram bot.
+    chat_id: "YOUR_CHAT_ID"
+    # The proxy URL for the Telegram bot. Defaults to None.
+    proxy_url: "YOUR_PROXY_URL"
+    # The API request timeout for the Telegram bot. Default is 60.
+    api_request_timeout: 60
+
+# The log level for the application. Defaults to "INFO".
+log_level: "INFO"
+# The period in days for generating reports. Defaults to 5.
+day_period: 5
+# The hour at which to send reports. Defaults to 12.
+send_report_hour: 12
+# The minute at which to send reports. Defaults to 0.
+send_report_minute: 0
+
+# The settings for generating daily reports.
+daily_report:
+    # Flag indicating whether to send the report. Defaults to true.
+    send_report: true
+    # The list of budget names to exclude from the report.
+    exclude_budgets: 
+        - "Budget 1"
+
+# The settings for generating monthly reports.
+periodic_report:
+    # Flag indicating whether to send the report. Defaults to true.
+    send_report: true
+    # The list of budget names to exclude from the report.
+    exclude_budgets: 
+        - "Budget 1"
+    # The list of category names to exclude from the report.
+    exclude_categories: 
+        - "Category 1"
+
+# The settings for generating periodic reports.
+monthly_report:
+    # Flag indicating whether to send the report. Defaults to true.
+    send_report: true
+    # The list of category names to exclude from the report.
+    exclude_categories: 
+        - "Category 1"
