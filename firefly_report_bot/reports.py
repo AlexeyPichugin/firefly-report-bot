@@ -105,7 +105,11 @@ class BaseReport(ABC):
         return sections
 
     async def get_budgets(
-        self, client: FireflyClient, exclude: list[str] | None = None, add_periodic_spent: bool = False
+        self,
+        client: FireflyClient,
+        exclude: list[str] | None = None,
+        add_periodic_spent: bool = False,
+        accumulate_limit: bool = False,
     ) -> list[formatting.Text]:
         """
         Asynchronously retrieves budgets based on certain criteria and formatting options.
@@ -115,6 +119,7 @@ class BaseReport(ABC):
             client (FireflyClient): An instance of FireflyClient used to retrieve budgets.
             exclude (list[str] | None, optional): List of budget names to exclude. Defaults to None.
             add_periodic_spent (bool, optional): Flag indicating whether to add periodic spent data. Defaults to False.
+            accumulate_limit (bool, optional): Flag indicating whether to accumulate the budget limit. Defaults to False
 
         Returns:
             list[formatting.Text]: A list of formatted budget sections.
@@ -132,10 +137,20 @@ class BaseReport(ABC):
                     client=client, budget_name=budget.name, start_dttm=self.start_dttm, end_dttm=self.end_dttm
                 )
                 day_of_month = monthrange(self.start_dttm.year, self.start_dttm.month)[1]
-                days = (self.end_dttm - self.start_dttm).days + 1
-                period_budget = budget.limit * days / day_of_month
-                budget_data = f"{spent} / {period_budget:.2f}"
-                symbol = "✅" if budget.limit and spent <= period_budget else "❌"
+
+                if accumulate_limit:
+                    days_until_end = day_of_month - self.end_dttm.day + 1
+                    period_budget = (budget.limit - budget.spent) / days_until_end if budget.limit else 0
+                    budget_data = f"{spent} / {period_budget:.2f}"
+                else:
+                    days = (self.end_dttm - self.start_dttm).days + 1
+                    period_budget = budget.limit * days / day_of_month
+                    budget_data = f"{spent} / {period_budget:.2f}"
+
+                if budget.limit:
+                    symbol = "✅" if spent <= period_budget else "❌"
+                else:
+                    symbol = "✅" if spent == 0 else "❌"
 
                 all_spent = budget.spent if budget.spent else 0
                 budget_balanse = budget.limit - all_spent
@@ -148,6 +163,7 @@ class BaseReport(ABC):
                 sections.append(
                     formatting.as_key_value(f"{symbol} {budget.name}", f"{budget_data} ({availible_budget_data})\n")
                 )
+
             else:
                 spent = budget.spent if budget.spent else 0
                 budget_data = f"{spent} / {budget.limit}"
@@ -156,6 +172,7 @@ class BaseReport(ABC):
                     budget_data += f" ({spended_percent}%)"
                 symbol = "✅" if budget.limit and spent <= budget.limit else "❌"
                 sections.append(formatting.as_key_value(f"{symbol} {budget.name}", budget_data + "\n"))
+
         return sections
 
     async def _get_transactions_sum_by_budget(
@@ -295,7 +312,10 @@ class DaylyReport(BaseReport):
         settings = get_settings()
         sections = [formatting.as_section(formatting.Bold(f"📋 {self.header}"))]
         budgets = await self.get_budgets(
-            client=client, exclude=settings.daily_report.exclude_budgets, add_periodic_spent=True
+            client=client,
+            exclude=settings.daily_report.exclude_budgets,
+            add_periodic_spent=True,
+            accumulate_limit=True,
         )
         sections.extend(budgets)
         sections.append(formatting.Text("\n"))
@@ -332,7 +352,10 @@ class LastNDaysReport(BaseReport):
         settings = get_settings()
         sections = [formatting.as_section(formatting.Bold(f"📋 {self.header}"))]
         budgets = await self.get_budgets(
-            client=client, add_periodic_spent=True, exclude=settings.periodic_report.exclude_budgets
+            client=client,
+            exclude=settings.periodic_report.exclude_budgets,
+            add_periodic_spent=True,
+            accumulate_limit=False,
         )
         sections.extend(budgets)
 
