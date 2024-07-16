@@ -117,6 +117,7 @@ class AutoBudgetType(Enum):
 
     RESET = "reset"
     ROLLOVER = "rollover"
+    ADJUSTED = "adjusted"
     NONE = "none"
 
 

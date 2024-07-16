@@ -257,16 +257,33 @@ class BaseReport(ABC):
             exclude = []
         sections = []
         categories = await client.get_categories(start_dttm=self.start_dttm, end_dttm=self.end_dttm)
+
+        period_length = (self.end_dttm - self.start_dttm) + timedelta(days=1)
+        last_period_start_dttm = self.start_dttm - period_length
+        last_period_end_dttm = self.end_dttm - period_length
+        last_period_categories = await client.get_categories(
+            start_dttm=last_period_start_dttm, end_dttm=last_period_end_dttm
+        )
+        last_period_categories_dict = {category.name: category for category in last_period_categories}
+
         categories.sort(key=lambda x: x.spent.sum or 0 if x.spent else 0, reverse=False)
         sections.append(formatting.as_section(formatting.Bold("🟢 Categories: 🟢\n")))
         for category in categories:
             if category.name in exclude:
                 continue
             spent = category.spent.sum if category.spent else 0
-            earned = category.earned.sum if category.earned else 0
-            if spent is None or (spent == 0 and earned == 0):
+            if spent is None or spent == 0:
                 continue
-            sections.append(formatting.as_key_value(f"{category.name}", f"-{spent * -1} / +{earned}\n"))
+            last_period_operation = last_period_categories_dict.get(category.name)
+            value = f"-{spent * -1}"
+
+            delta = (
+                spent - (last_period_operation.spent.sum or 0)
+                if last_period_operation and last_period_operation.spent is not None
+                else spent
+            )
+            value += f" (🔴 {delta:.2f})" if delta > 0 else f" (🟢 {delta:.2f})"
+            sections.append(formatting.as_key_value(f"{category.name}", value + "\n"))
         return sections
 
 
