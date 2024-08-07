@@ -13,6 +13,8 @@ from firefly_report_bot.bot.routers.root import RootRouter
 from firefly_report_bot.bot.routers.accounts import AccountsRouter
 from firefly_report_bot.bot.routers.transactions import TransactionsRouter
 from firefly_report_bot.bot.routers.report import ReportRouter
+from firefly_report_bot.bot.routers.budget import BudgetRouter
+from firefly_report_bot.bot.routers.categories import CategoriesRouter
 
 if TYPE_CHECKING:
     from firefly_report_bot.client import FireflyClient
@@ -46,6 +48,8 @@ class Bot:
         self.dispatcher.include_router(TransactionsRouter(client=self.client).get_router())
         self.dispatcher.include_router(AccountsRouter(client=self.client).get_router())
         self.dispatcher.include_router(ReportRouter(client=self.client).get_router())
+        self.dispatcher.include_router(BudgetRouter(client=self.client).get_router())
+        self.dispatcher.include_router(CategoriesRouter(client=self.client).get_router())
         self.dispatcher.include_router(RootRouter(client=self.client).get_router())
         logger.info("[BOT] Telegram bot started")
 
