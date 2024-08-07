@@ -80,7 +80,7 @@ class BaseReport(ABC):
             transaction_sum = 0
             if transactions:
                 transaction_sum = sum([transaction.amount for transaction in transactions])  # type: ignore
-            section_value += f"{round(transaction_sum, 2)}"
+            section_value += f"{transaction_sum:.2f}"
             division_sections = []
             if add_division:
                 accounts_division: DefaultDict[str, float] = defaultdict(float)
@@ -88,8 +88,7 @@ class BaseReport(ABC):
                     accounts_division[transaction.source_name or "None"] += transaction.amount or 0
 
                 division_sections = [
-                    formatting.as_list(f"{account}: {round(amount, 2)}\n")
-                    for account, amount in accounts_division.items()
+                    formatting.as_list(f"{account}: {amount:.2f}\n") for account, amount in accounts_division.items()
                 ]
             if add_months_data:
                 transactions_month = await client.get_transactions(
@@ -98,7 +97,7 @@ class BaseReport(ABC):
                 transactions_month_sum = 0
                 if transactions_month:
                     transactions_month_sum = sum([transaction.amount for transaction in transactions_month])  # type: ignore
-                section_value += f" ({round(transactions_month_sum, 2)})"
+                section_value += f" ({transactions_month_sum:.2f})"
             sections.append(formatting.as_key_value(transaction_type.value.capitalize(), section_value + "\n"))
             for section in division_sections:
                 sections.append(section)
@@ -141,11 +140,11 @@ class BaseReport(ABC):
                 if accumulate_limit:
                     days_until_end = day_of_month - self.end_dttm.day + 1
                     period_budget = (budget.limit - budget.spent) / days_until_end if budget.limit else 0
-                    budget_data = f"{spent} / {period_budget:.2f}"
+                    budget_data = f"{spent:.2f} / {period_budget:.2f}"
                 else:
                     days = (self.end_dttm - self.start_dttm).days + 1
                     period_budget = budget.limit * days / day_of_month
-                    budget_data = f"{spent} / {period_budget:.2f}"
+                    budget_data = f"{spent:.2f} / {period_budget:.2f}"
 
                 if budget.limit:
                     symbol = "✅" if spent <= period_budget else "❌"
@@ -166,7 +165,7 @@ class BaseReport(ABC):
 
             else:
                 spent = budget.spent if budget.spent else 0
-                budget_data = f"{spent} / {budget.limit}"
+                budget_data = f"{spent:.2f} / {budget.limit:.2f}"
                 if budget.limit:
                     spended_percent = int((spent / budget.limit) * 100)
                     budget_data += f" ({spended_percent}%)"
@@ -236,7 +235,7 @@ class BaseReport(ABC):
             amount = transaction.amount
 
             name = f"[{source_name}] {category_name} ({budget_name})"
-            value = f"{amount} ({description})\n"
+            value = f"{amount:.2f} ({description})\n"
             sections.append(formatting.as_key_value(name, value))
 
         return sections
@@ -275,7 +274,7 @@ class BaseReport(ABC):
             if spent is None or spent == 0:
                 continue
             last_period_operation = last_period_categories_dict.get(category.name)
-            value = f"-{spent * -1}"
+            value = f"-{(spent * -1):.2f}"
 
             delta = (
                 spent - (last_period_operation.spent.sum or 0)
