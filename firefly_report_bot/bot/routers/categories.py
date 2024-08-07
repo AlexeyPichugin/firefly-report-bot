@@ -41,13 +41,20 @@ class CategoriesRouter(BaseRoter):
 
     async def get_category_transactions(self, callback: types.CallbackQuery) -> None:
         logger.info(f"[BOT] Get category transactions callback from user {callback.from_user.id}")
+        if callback.data is None:
+            await callback.answer("Internal error")
+            return
         category_name = callback.data.split("/")[-1]
         start_dttm = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         end_dttm = datetime.now().replace(hour=23, minute=59, second=59, microsecond=0)
         _transactions = await self.client.get_transactions(start_dttm=start_dttm, end_dttm=end_dttm)
         transactions = [transaction for transaction in _transactions if transaction.category_name == category_name]
-        transactions.sort(key=lambda transaction: transaction.created_at, reverse=True)
+        if transactions:
+            transactions.sort(key=lambda transaction: transaction.created_at, reverse=True)  # type: ignore
         text = formatting.as_section(*self._format_transactions(transactions))
+        if callback.message is None or isinstance(callback.message, types.InaccessibleMessage):
+            await callback.answer("Internal error")
+            return
         await callback.message.edit_text(text=text.as_html())
         await callback.message.edit_reply_markup(reply_markup=get_categories_inline_kb(categories=[]))
         await callback.answer()

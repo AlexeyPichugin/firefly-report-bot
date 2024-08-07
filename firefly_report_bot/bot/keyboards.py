@@ -120,7 +120,7 @@ def get_categories_inline_kb(categories: list[str]) -> types.InlineKeyboardMarku
     """
     settings = get_settings()
     builder = InlineKeyboardBuilder()
-    row = []
+    row: list[types.InlineKeyboardButton] = []
     for inx, category in enumerate(categories):
         if row and inx % settings.categories_in_row == 0:
             builder.row(*row)
