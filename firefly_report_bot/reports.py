@@ -423,7 +423,7 @@ def get_reports() -> Sequence[BaseReport]:
         and current_date.day != 1
         and (current_date.day - 1) % settings.day_period == 0
     ):
-        start_dttm = (current_date - timedelta(days=settings.day_period)).replace(hour=0, minute=0, second=0)
+        start_dttm = (yesterday - timedelta(days=settings.day_period)).replace(hour=0, minute=0, second=0)
         end_dttm = yesterday.replace(hour=23, minute=59, second=59)
         reports.append(
             LastNDaysReport(
