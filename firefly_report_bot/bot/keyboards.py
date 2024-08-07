@@ -1,9 +1,13 @@
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from aiogram import types
 from datetime import datetime, timedelta
+from collections import namedtuple
 
 from firefly_report_bot.client.enums import AccountType
 from firefly_report_bot.config import get_settings
+
+
+CategoryRow = namedtuple("CategoryRow", ["first", "second"])
 
 
 def get_main_kb() -> types.ReplyKeyboardMarkup:
@@ -22,6 +26,7 @@ def get_main_kb() -> types.ReplyKeyboardMarkup:
         types.KeyboardButton(text="💳 Accounts"),
         types.KeyboardButton(text="🔀 Transactions"),
         types.KeyboardButton(text="📊 Budgets"),
+        types.KeyboardButton(text="🧾 Categories"),
         types.KeyboardButton(text="📈 Reports"),
     )
     buidler.adjust(2)
@@ -103,4 +108,26 @@ def get_reports_inline_kb() -> types.InlineKeyboardMarkup:
     )
     builder.row(types.InlineKeyboardButton(text="📊 Monthly report", callback_data="report/monthly"))
 
+    return builder.as_markup()
+
+
+def get_categories_inline_kb(categories: list[str]) -> types.InlineKeyboardMarkup:
+    """
+    Generates an inline keyboard markup for the categories.
+
+    Returns:
+        types.InlineKeyboardMarkup: The inline keyboard markup for the categories.
+    """
+    settings = get_settings()
+    builder = InlineKeyboardBuilder()
+    row: list[types.InlineKeyboardButton] = []
+    for inx, category in enumerate(categories):
+        if row and inx % settings.categories_in_row == 0:
+            builder.row(*row)
+            row = []
+        row.append(types.InlineKeyboardButton(text=category, callback_data=f"category/{category}"))
+    if row:
+        builder.row(*row)
+    # builder.row(types.InlineKeyboardButton(text="➕ Add", callback_data="categories/add"))
+    builder.row(types.InlineKeyboardButton(text="✅ OK", callback_data="categories/OK"))
     return builder.as_markup()
