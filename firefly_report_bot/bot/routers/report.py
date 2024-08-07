@@ -98,7 +98,7 @@ class ReportRouter(BaseRoter):
         settings = get_settings()
         logger.info(f"[BOT] Periodic report request from user {callback.from_user.id}")
         yesterday = datetime.now() - timedelta(days=1)
-        start_dttm = (yesterday - timedelta(days=settings.day_period)).replace(hour=0, minute=0, second=0)
+        start_dttm = (datetime.now() - timedelta(days=settings.day_period)).replace(hour=0, minute=0, second=0)
         end_dttm = yesterday.replace(hour=23, minute=59, second=59)
         report = LastNDaysReport(
             header=f"Last {settings.day_period} days report: {start_dttm.strftime('%Y-%m')} {start_dttm.day}-{end_dttm.day}",
