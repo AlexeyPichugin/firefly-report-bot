@@ -21,6 +21,7 @@ def get_main_kb() -> types.ReplyKeyboardMarkup:
     buidler.add(
         types.KeyboardButton(text="💳 Accounts"),
         types.KeyboardButton(text="🔀 Transactions"),
+        types.KeyboardButton(text="📊 Budgets"),
         types.KeyboardButton(text="📈 Reports"),
     )
     buidler.adjust(2)
