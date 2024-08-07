@@ -282,7 +282,7 @@ class BaseReport(ABC):
                 if last_period_operation and last_period_operation.spent is not None
                 else spent
             )
-            value += f" (🔴 {delta:.2f})" if delta > 0 else f" (🟢 {delta:.2f})"
+            value += f" (📉 {delta:.2f})" if delta > 0 else f" (📈 {delta:.2f})"
             sections.append(formatting.as_key_value(f"{category.name}", value + "\n"))
         return sections
 
