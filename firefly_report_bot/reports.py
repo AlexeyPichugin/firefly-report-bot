@@ -140,11 +140,11 @@ class BaseReport(ABC):
                 if accumulate_limit:
                     days_until_end = day_of_month - self.end_dttm.day + 1
                     period_budget = (budget.limit - budget.spent) / days_until_end if budget.limit else 0
-                    budget_data = f"{spent:.2f} / {period_budget:.2f}"
+                    budget_data = f"{spent:.2f} / {(period_budget if period_budget > 0 else 0):.2f}"
                 else:
                     days = (self.end_dttm - self.start_dttm).days + 1
                     period_budget = budget.limit * days / day_of_month
-                    budget_data = f"{spent:.2f} / {period_budget:.2f}"
+                    budget_data = f"{spent:.2f} / {(period_budget if period_budget > 0 else 0):.2f}"
 
                 if budget.limit:
                     symbol = "✅" if spent <= period_budget else "❌"
@@ -153,11 +153,13 @@ class BaseReport(ABC):
 
                 all_spent = budget.spent if budget.spent else 0
                 budget_balanse = budget.limit - all_spent
-                budget_balanse_symbol = "🟢" if budget_balanse >= 0 else "🔴"
-                spended_percent = int((budget_balanse / budget.limit) * 100) if budget.limit else 0
-                availible_budget_data = f" {budget_balanse_symbol} Available {budget_balanse:.2f}"
-                if spended_percent:
-                    availible_budget_data += f" ({spended_percent}%)"
+                if budget_balanse > 0:
+                    spended_percent = int((budget_balanse / budget.limit) * 100) if budget.limit else 0
+                    availible_budget_data = f"Available {budget_balanse:.2f}"
+                    if spended_percent:
+                        availible_budget_data += f" ({spended_percent}%)"
+                else:
+                    availible_budget_data = f"Overrun {budget_balanse:.2f}"
 
                 sections.append(
                     formatting.as_key_value(f"{symbol} {budget.name}", f"{budget_data} ({availible_budget_data})\n")
