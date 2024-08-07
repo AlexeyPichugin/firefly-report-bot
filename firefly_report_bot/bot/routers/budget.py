@@ -9,10 +9,28 @@ class BudgetRouter(BaseRoter):
     router = Router(name="budget_router")
 
     def get_router(self) -> Router:
+        """
+        Get the router for handling budget requests.
+
+        This method initializes the router with a message handler that triggers the `get_budget` method when the user sends a message with the text "📊 Budgets".
+
+        Returns:
+            Router: The router object.
+        """
+
         self.router.message(F.text == "📊 Budgets")(self.get_budget)
         return self.router
 
     async def get_budget(self, message: types.Message) -> None:
+        """
+        Retrieves the budget information for the user and sends a formatted message with the budget details.
+
+        Args:
+            message (types.Message): The message object containing information about the user.
+
+        Returns:
+            None
+        """
 
         logger.info(f"[BOT] Budget request from user {message.from_user.id if message.from_user else None}")
         start_dttm = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
