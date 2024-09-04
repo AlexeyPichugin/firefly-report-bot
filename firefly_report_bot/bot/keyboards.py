@@ -131,3 +131,24 @@ def get_categories_inline_kb(categories: list[str]) -> types.InlineKeyboardMarku
     # builder.row(types.InlineKeyboardButton(text="➕ Add", callback_data="categories/add"))
     builder.row(types.InlineKeyboardButton(text="✅ OK", callback_data="categories/OK"))
     return builder.as_markup()
+
+
+def get_budgets_inline_kb(budgets: list[str]) -> types.InlineKeyboardMarkup:
+    """
+    Generates an inline keyboard markup for the budgets.
+
+    Returns:
+        types.InlineKeyboardMarkup: The inline keyboard markup for the budgets.
+    """
+    settings = get_settings()
+    builder = InlineKeyboardBuilder()
+    row: list[types.InlineKeyboardButton] = []
+    for inx, budget in enumerate(budgets):
+        if row and inx % settings.budgets_in_row == 0:
+            builder.row(*row)
+            row = []
+        row.append(types.InlineKeyboardButton(text=budget, callback_data=f"budget/{budget}"))
+    if row:
+        builder.row(*row)
+    builder.row(types.InlineKeyboardButton(text="✅ OK", callback_data="budgets/OK"))
+    return builder.as_markup()

@@ -26,6 +26,10 @@ day_period: 5
 send_report_hour: 12
 # The minute at which to send reports. Defaults to 0.
 send_report_minute: 0
+# Categroies buttons in row. Defaults to 2.
+categories_in_row: 2
+# Budgets buttons in row. Defaults to 2.
+budgets_in_row: 2
 
 # The settings for generating daily reports.
 daily_report:

@@ -92,6 +92,7 @@ class Settings(BaseSettings):
     telegram: TelegramSettings
     log_level: LogLevel = LogLevel.INFO
     categories_in_row: int = 2
+    budgets_in_row: int = 2
     day_period: int = 5
     send_report_hour: int = 12
     send_report_minute: int = 0
