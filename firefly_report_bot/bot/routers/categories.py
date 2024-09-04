@@ -26,6 +26,15 @@ class CategoriesRouter(BaseRoter):
         )
 
     def _format_transactions(self, transactions: list[Transaction]) -> list[formatting.Text]:
+        """
+        Formats a list of Transaction objects into a list of formatted sections.
+
+        Args:
+            transactions (list[Transaction]): The transactions to format.
+
+        Returns:
+            list[formatting.Text]: The formatted sections.
+        """
         sections = [formatting.Text(formatting.Bold("🟢 Transactions"))]
         if not transactions:
             sections.append(formatting.as_section("No transactions found.\n"))
@@ -40,6 +49,17 @@ class CategoriesRouter(BaseRoter):
         return sections
 
     async def get_category_transactions(self, callback: types.CallbackQuery) -> None:
+        """
+        Asynchronously handles the get_category_transactions callback from the user.
+
+        Retrieves transactions for the specified category and updates the callback message with the formatted transaction information.
+
+        Args:
+            callback (types.CallbackQuery): The callback query object triggering the transaction retrieval.
+
+        Returns:
+            None
+        """
         logger.info(f"[BOT] Get category transactions callback from user {callback.from_user.id}")
         if callback.data is None:
             await callback.answer("Internal error")
@@ -60,6 +80,17 @@ class CategoriesRouter(BaseRoter):
         await callback.answer()
 
     async def categories_ok(self, callback: types.CallbackQuery) -> None:
+        """
+        Asynchronously handles the categories_ok callback from the user.
+
+        Deletes the message associated with the callback.
+
+        Args:
+            callback (types.CallbackQuery): The callback query triggering this function.
+
+        Returns:
+            None
+        """
         logger.info(f"[BOT] Categories OK callback from user {callback.from_user.id}")
         if callback.message is None or isinstance(callback.message, types.InaccessibleMessage):
             return
